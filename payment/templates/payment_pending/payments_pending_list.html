@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Pagamentos Pendentes </h1>
+<div class="row gy-3">
+    <!-- Formulário de pesquisa -->
+    <div class="col-md-6">
+        <form action="{% url 'payment_pending_list' %}" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.n3ame }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="col-md-6 d-flex justify-content-between flex-wrap gap-2">
+        <a href="{% url 'payment_received' %}" class="btn btn-outline-warning">Pagamentos Recebidos</a>
+        <a href="{% url 'payment_delay_list' %}" class="btn btn-outline-warning">Pagamentos Atrasados</a>
+        <a href="{% url 'pay_extra_created' %}" class="text-decoration-none">
+            <button class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-plus-lg"></i>
+                <span>Pagamento extra</span>
+            </button>
+        </a>
+
+    </div>
+</div>
+
+<div class="m-3"></div>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered text-center">
+        <thead>
+            <tr>
+                <th>Aluno</th>
+                <th>Método Cobrança</th>
+                <th>Nº Aulas</th>
+                <th>Desconto</th>
+                <th>Valor total</th>
+                <th>Registrar</th>
+                <th>Vencimento</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments_pending %}
+            <tr>
+                <td>{{ payment.student.name}}</td>
+                <td>{{ payment.student.get_billing_method_display }}</td>
+                <td>{{ payment.student.class_quantity }}</td>
+                <td>{{ payment.student.discount }}%</td>
+                <td>R${{ payment.student.value_discount|floatformat:2}}</td>
+                <td>
+                    <a href="{% url 'payment_create' payment.id %}">
+                        <button class="btn btn-primary">Registrar Pagamento</button>
+                    </a>
+                </td>
+                <td>{{payment.student.due_date}}</td>
+                <td>
+                    <a href="{% url 'payment_pending_detail' payment.student.id %}" class="p-2">
+                        <i class="bi bi-eye bg-info p-1 text-dark rounded"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'components/_pagination.html' %}
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1> Alunos </h1>
+<div class="row">
+    <form action="{% url 'student_list' %}" method="get" class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        <div class="input-group mt-2">
+            <select class="form-select" name="level" id="level" aria-placeholder="Categoria">
+                <option value="" {% if not request.GET.level %} selected {% endif %}>Todas Categoria</option>
+                {% for value, label in level_choices %}
+                <option value="{{ value }}" {% if value in request.GET.level %} selected {% endif %}>{{ label }}</option>
+
+                {% endfor %}
+            </select>
+            <select class="form-select" name="gender" id="gender" aria-placeholder="Gênero">
+                <option value="{{value}}" {% if not request.GET.gender %} selected {% endif %}>Todos Gêneros</option>
+                {% for value, label in gender_choices %}
+                <option value="{{value}}" {% if value in request.GET.gender %} selected {% endif %}>{{label}}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-filter"></i>Filtrar
+            </button>
+        </div>
+        <div class="m-3"></div>
+    </form>
+
+    {% if perms.student.add_student %}
+    <div class="col-md-6">
+        <a href="{% url 'student_create' %}"><button class="btn btn-outline-warning">Novo Aluno</button></a>
+    </div>
+    {% endif %}
+</div>
+<div class="m-3"></div>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered text-center">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Gênero</th>
+                <th>Método de Cobrança</th>
+                <th>Treinos</th>
+                <th>Nº aulas</th>
+                <th>Preço aula</th>
+                <th>Desconto</th>
+                <th>Categoria</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Telefone</th>
+                <th>Descrição</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{student.name}}</td>
+                <td>{{student.gender}}</td>
+                <td>{{ student.get_billing_method_display }}</td>
+                <td>{{student.class_days}}</td>
+                <td>{{student.class_quantity}}</td>
+                <td>{{student.class_price}}</td>
+                <td>{{student.discount}}%</td>
+                <td>{{student.level}}</td>
+                <td>{{student.due_date}}</td>
+                <td>{{student.status}}</td>
+                <td>{{student.phone_number}}</td>
+                <td>{{student.notes}}</td>
+                <div>
+                    <td>
+                        {% if perms.student.view_student %}
+                        <a href="{% url 'student_detail' student.id %}" class="p-2"><i class="bi bi-eye bg-info p-1 text-dark rounded"></i></a>
+                        {% endif %}
+                        {% if perms.student.change_student %}
+                        <a href="{% url 'student_update' student.id %}"><i class="bi bi-pencil bg-warning p-1 text-dark rounded"></i></a>
+                        {% endif %}
+                    </td>
+                </div>
+            </tr>
+            <tr>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'components/_pagination.html' %}
+{% endblock %}

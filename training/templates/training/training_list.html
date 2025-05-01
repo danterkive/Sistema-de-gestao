@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="m-3"></div>
+        <form action="{% url 'training_list' %}" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="name" placeholder="Nome" value="{{ request.GET.name }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="m-3"></div>
+        <!-- Span da Arena Criciuma -->
+        <div class="d-flex">
+            <span class="border p-2 text-white rounded shadow-sm me-2">
+                Treinos Arena Criciuma: {{ criciuma }}
+            </span>
+
+            <!-- Span da Arena Brasil -->
+            <span class="border p-2 text-white rounded shadow-sm ">
+                Treinos Arena Brasil: {{ brasil }}
+            </span>
+        </div>
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="m-3"></div>
+    <a href="{% url 'training_create' %}"><button class="btn btn-outline-warning">Nova turma</button></a>
+    <a href="{% url 'location_training_list' %}"><button class="btn btn-outline-warning">Locais de treinos</button></a>
+</div>
+
+
+
+{% for day, trainings in training_days.items %}
+{% if trainings %}
+<div class="m-3"></div>
+<h3>Treinos de {{ trainings.first.get_day_display }}</h3>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-lg-4 g-3">
+    {% for training in trainings %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">{{ training.time }} / {{ training.location }}</h5>
+            </div>
+            <div class="card-body">
+                {% for student in training.student.all %}
+                <div class="d-flex justify-content-between">
+                    <span>{{ student.name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{% url 'training_detail' training.id %}" class="p-2">
+                    <i class="bi bi-eye bg-info p-1 text-dark rounded"></i>
+                </a>
+                <a href="{% url 'training_update' training.id %}" class="p-2">
+                    <i class="bi bi-pencil bg-warning p-1 text-dark rounded"></i>
+                </a>
+                <a href="{% url 'training_delete' training.id %}" class="p-2">
+                    <i class="bi bi-archive-fill p-1 bg-danger text-light rounded"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+{% include 'components/_pagination.html' %}
+{% endblock %}
